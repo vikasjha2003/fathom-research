@@ -1,4 +1,5 @@
 # Imports
+import re
 from typing import TypedDict, Annotated
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
@@ -6,6 +7,7 @@ from langgraph.graph import StateGraph, START, END
 from langchain_groq import ChatGroq
 from langchain_core.messages import ToolMessage, AIMessage
 from groq import BadRequestError
+from langchain_google_genai import ChatGoogleGenerativeAI
 from rich import print
 
 import tools as custom_tools
@@ -19,6 +21,7 @@ reader_tools = [custom_tools.scrape_url]
 
 MAX_TOOL_ROUNDS = 1
 MAX_WRITE_ATTEMPTS = 3
+APPROVAL_SCORE = 7 
 
 
 # State
@@ -39,9 +42,11 @@ class State(TypedDict):
 
 
 # Model / LLM
-llm = ChatGroq(model="openai/gpt-oss-120b")
+llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.3)
 searcher_llm = llm.bind_tools(tools=searcher_tools)
 reader_llm = llm.bind_tools(tools=reader_tools)
+writer_llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.7)
+critic_llm = ChatGoogleGenerativeAI(model="gemini-3.8-flash", temperature=0.2)
 
 
 def safe_tool_invoke(model, messages):
@@ -137,9 +142,10 @@ def writer_node(state: State):
         "topic": state["topic"],
         "research": research,
         "critique": state["critic"],
+        "previous_draft": state["writer"],
     })
 
-    response = llm.invoke(messages)
+    response = writer_llm.invoke(messages)
 
     return {
         "writer": response.content,
@@ -150,19 +156,27 @@ def writer_node(state: State):
 def critic_node(state: State):
     messages = prompts.CRITIC_PROMPT.invoke({"report": state["writer"]})
 
-    response = llm.invoke(messages)
-    review_text = response.content.strip()
+    response = critic_llm.invoke(messages)
 
-    last_line = review_text.splitlines()[-1].upper() if review_text else ""
-    is_approved = "VERDICT: APPROVED" in last_line
+    if isinstance(response.content, str):
+        review_text = response.content.strip()
+    else:
+        review_text = "\n".join(
+            block.get("text", "")
+            for block in response.content
+            if isinstance(block, dict)
+        ).strip()
+
+    m = re.search(r"Score:\s*(\d+(?:\.\d+)?)\s*/\s*10", review_text, re.I)
+    score = float(m.group(1)) if m else 0.0
 
     return {
         "critic": review_text,
-        "is_approved": is_approved,
+        "is_approved": score >= APPROVAL_SCORE,
     }
 
 
-# Routers
+# Routers 
 def searcher_router(state: State):
     if getattr(state["messages"][-1], "tool_calls", None):
         return "search_tool"

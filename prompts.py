@@ -48,6 +48,9 @@ WRITER_PROMPT = ChatPromptTemplate.from_messages([
 Research:
 {research}
 
+Previous draft (empty if this is the first draft):
+{previous_draft}
+
 Critique of previous draft (empty if this is the first draft):
 {critique}
 
@@ -62,7 +65,7 @@ Rules:
 - Use only facts present in the research. Never invent statistics, quotes or URLs.
   If the research is thin on a point, say so briefly.
 - Attribute claims to their source inline (e.g. "according to <site>").
-- If a critique is given, fix every issue it raises and keep what it praised.
+- If a critique is given, revise the previous draft: fix every issue it raises and keep its strong parts unchanged.
 - Output only the complete report, with no preamble or notes about your changes."""
     ),
 ])
@@ -75,8 +78,17 @@ CRITIC_PROMPT = ChatPromptTemplate.from_messages([
     ),
     (
         "human",
-        """Evaluate this research report on depth and specificity, source attribution,
-logical structure, clarity, and whether claims look supported rather than invented.
+        """Rate this research report from 1 to 10 for an intelligent general reader.
+
+Scoring guide:
+- 9-10: exceptional; specific, well-sourced, insightful
+- 7-8: solid; clear structure, specific findings, claims attributed to sources, only minor gaps
+- 5-6: noticeable problems such as vague findings, missing attribution or thin analysis
+- 1-4: major problems
+
+Notes:
+- You cannot see the source material, so judge specificity, attribution and internal
+  consistency, not whether facts are true.
 
 Report:
 {report}
@@ -85,11 +97,6 @@ Reply in exactly this format:
 
 Score: X/10
 Strengths: <max 2 short bullets>
-Fixes: <max 3 short, concrete, actionable bullets>
-VERDICT: APPROVED or VERDICT: REVISE
-
-Rules:
-- Score 8 or higher means APPROVED; below 8 means REVISE.
-- The final line must contain only the verdict, with nothing after it."""
+Fixes: <only changes that would materially improve the report, max 3 short bullets, or "None">"""
     ),
 ])

@@ -3,6 +3,7 @@ langchain
 langchain-groq
 langchain-core
 langchain-tavily
+langchain-google-genai
 
 tavily-python
 requests
