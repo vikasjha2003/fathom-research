@@ -274,35 +274,13 @@ This project is useful for:
 - good fit for experimentation and extension,
 - straightforward UI for non-technical users.
 
-## Potential extension ideas
-
-- add PDF export,
-- support citations with page references,
-- enable caching for repeated searches,
-- add source ranking and deduplication,
-- support multiple output formats (HTML, JSON, DOCX),
-- add a backend API layer for remote access,
-- integrate more structured retrieval and document vector storage.
-
 ## Summary
 
 Fathom Research is a compact but thoughtful agentic research system. It demonstrates how a multi-agent workflow can organize search, reading, writing, and evaluation into a single coherent pipeline.
 
 For a practical research assistant, it balances simplicity and power: a graph-driven architecture, external search and scraping, and a built-in review loop that tries to keep the output factual and readable.
 
-## License
-
-No explicit license file is present in the repository, so you should confirm the intended open-source licensing before redistributing or using it commercially.
-
 ## Notes
 
 This project is built as a research/demo system and is best suited for experimentation and learning. It is not a production-grade web crawler or a full research platform out of the box, but it is a strong foundation for a more advanced workflow.
 
----
-
-If you want, I can also add:
-
-- a `requirements-dev.txt` for linting/testing,
-- a `.env.example` file,
-- a basic CI workflow,
-- or a polished landing page for the project.
