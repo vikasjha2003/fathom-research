@@ -147,12 +147,6 @@ with st.sidebar:
     st.markdown('<div class="brand">🌊 Fathom</div>', unsafe_allow_html=True)
     st.caption("Research that goes below the surface.")
     st.divider()
-    st.markdown("**Quality controls**")
-    pipeline.APPROVAL_SCORE = st.slider("Approval score", 5, 10, pipeline.APPROVAL_SCORE,
-                                        help="Minimum critic score (out of 10) to accept a draft.")
-    pipeline.MAX_WRITE_ATTEMPTS = st.slider("Max drafts", 1, 5, pipeline.MAX_WRITE_ATTEMPTS,
-                                            help="The writer revises until approved or this limit is hit.")
-    st.divider()
     st.markdown("**How it works**")
     st.caption("1. A search agent runs several web queries.\n\n2. A reader agent scrapes the best pages.\n\n"
                "3. A writer drafts a sourced report.\n\n4. A second model critiques it, and the writer revises.")
