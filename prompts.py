@@ -87,8 +87,11 @@ Scoring guide:
 - 1-4: major problems
 
 Notes:
-- You cannot see the source material, so judge specificity, attribution and internal
-  consistency, not whether facts are true.
+- The source material has been added, so judge specificity, attribution and internal
+  consistency, and check whether facts are true.
+
+Source Material:
+{sourceMaterial}
 
 Report:
 {report}

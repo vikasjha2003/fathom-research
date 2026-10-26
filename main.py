@@ -154,7 +154,12 @@ def writer_node(state: State):
 
 
 def critic_node(state: State):
-    messages = prompts.CRITIC_PROMPT.invoke({"report": state["writer"]})
+    messages = prompts.CRITIC_PROMPT.invoke(
+        {
+            "report": state["writer"],
+            "sourceMaterial": state["reader"]
+        }
+    )
 
     response = critic_llm.invoke(messages)
 
